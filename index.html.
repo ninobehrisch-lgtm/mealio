@@ -1,0 +1,462 @@
+
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#19764c">
+<title>Mealio – Dein Wochenplan</title>
+<style>
+:root{--g:#19764c;--dark:#193d2a;--bg:#f4f8f4;--muted:#6b8172}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--dark);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid #e2eae3;padding:13px 17px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:26px;font-weight:800;color:var(--g)}
+main{max-width:650px;margin:auto;padding:17px 15px 105px}
+.card{background:white;border-radius:20px;padding:20px;margin-bottom:15px;box-shadow:0 3px 16px #153b240b}
+h1{font-size:27px;margin:8px 0 13px}
+h2{font-size:21px;margin:10px 0}
+h3{font-size:17px;margin:12px 0}
+p{line-height:1.5}
+small,.muted{color:var(--muted)}
+.eyebrow{font-size:12px;color:var(--g);font-weight:800;letter-spacing:1px;text-transform:uppercase}
+button{border:0;border-radius:13px;padding:13px 15px;font:inherit;font-weight:700;background:var(--g);color:white;cursor:pointer}
+button:disabled{opacity:.4}
+button.alt{background:#e6f2e9;color:var(--g)}
+button.ghost{background:transparent;color:var(--g)}
+button.full{width:100%}
+.row{display:flex;gap:9px;align-items:center}
+.grow{flex:1;min-width:0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.progress{height:7px;background:#e2ebe3;border-radius:20px;overflow:hidden;margin:12px 0}
+.progress div{height:100%;background:var(--g)}
+.choice{display:block;width:100%;text-align:left;background:#f8fbf8;color:var(--dark);border:2px solid #e0eae1;margin:9px 0;padding:15px}
+.choice.active{border-color:var(--g);background:#e7f5eb}
+.chip{display:inline-block;border:1px solid #d4e4d7;background:white;color:var(--dark);padding:10px 12px;border-radius:24px;margin:4px;font-weight:500}
+.chip.active{background:#ddf2e3;border-color:var(--g)}
+input,select{width:100%;padding:13px;border:1px solid #d1e0d4;border-radius:12px;font:inherit;background:white}
+input[type=range]{accent-color:var(--g)}
+label.field{display:block;margin:16px 0 7px;font-weight:700}
+.big{font-size:38px;font-weight:800;text-align:center}
+.photo{width:100%;height:250px;object-fit:cover;background:#e3eee5;display:block}
+.recipe{border:1px solid #e1eae3;border-radius:18px;overflow:hidden;margin:13px 0}
+.recipebody{padding:16px}
+.badge{font-size:12px;color:var(--g);font-weight:800}
+.mini{display:flex;gap:11px;align-items:center;padding:12px 0;border-bottom:1px solid #edf1ed}
+.mini img{width:78px;height:70px;object-fit:cover;border-radius:11px}
+.stat{background:#eff7f0;padding:14px;border-radius:14px}
+.note{background:#fff4da;border-radius:12px;padding:13px;font-size:13px;line-height:1.5}
+.nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #dce8df;display:flex;padding:8px 5px max(8px,env(safe-area-inset-bottom));z-index:5}
+.nav button{flex:1;background:transparent;color:#69806e;padding:8px 2px;font-size:12px}
+.nav button.active{color:var(--g);background:#e7f4ea}
+.hidden{display:none}
+.check{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #edf1ed}
+.check input{width:22px;height:22px;accent-color:var(--g)}
+.check.done span{text-decoration:line-through;color:#91a295}
+.reminder{background:#e6f5ea;border:1px solid #c6e4cd}
+@media print{header,.nav,button{display:none!important}main{padding:0}.card{box-shadow:none;border:1px solid #ddd}}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">🌿 Mealio</div>
+<button class="ghost" onclick="go('settings')">⚙️</button>
+</header>
+<main id="app"></main>
+<nav class="nav hidden" id="nav">
+<button id="nav-home" onclick="go('home')">🏠<br>Start</button>
+<button id="nav-plan" onclick="go('plan')">📅<br>Wochenplan</button>
+<button id="nav-shop" onclick="go('shop')">🛒<br>Einkauf</button>
+<button id="nav-settings" onclick="go('settings')">⚙️<br>Einstellungen</button>
+</nav>
+<script>
+const DAYS=["Montag","Dienstag","Mittwoch","Donnerstag","Freitag","Samstag","Sonntag"];
+const MEALS=["Vorspeise","Frühstück","Mittagessen","Abendessen","Dessert"];
+const STORES=["Coop","Migros","Lidl","Aldi Suisse","Denner","Volg"];
+const raw=[
+["Bruschetta","Vorspeise",15,3,"1572695157366-5e585ab2b69f","Vegan","Gluten","Tomaten:150:g|Brot:80:g|Basilikum:8:g","Brot rösten|Tomaten schneiden|Mit Basilikum anrichten"],
+["Caprese mit Burrata","Vorspeise",10,5,"1608897013039-887f21d8c804","Vegetarisch","Milch","Tomaten:180:g|Burrata:100:g|Basilikum:8:g","Tomaten schneiden|Burrata darauflegen|Mit Basilikum servieren"],
+["Karottensuppe","Vorspeise",25,3,"1547592180-85f173990554","Vegan","","Karotten:220:g|Kartoffeln:100:g|Bouillon:250:ml","Gemüse schneiden|In Bouillon weich kochen|Pürieren"],
+["Bircher-Müesli","Frühstück",10,4,"1517673400267-0251440c45dc","Vegetarisch","Milch,Gluten","Haferflocken:65:g|Joghurt:150:g|Apfel:1:Stück","Apfel raffeln|Alles vermischen|Kalt servieren"],
+["Beeren-Pancakes","Frühstück",20,5,"1528207776546-365bb710ee93","Vegetarisch","Milch,Gluten,Eier","Mehl:90:g|Milch:120:ml|Eier:1:Stück|Beeren:100:g","Teig mischen|Pancakes ausbacken|Mit Beeren servieren"],
+["Früchte-Bowl","Frühstück",10,4,"1490645935967-10de6ba17061","Vegan","","Banane:1:Stück|Apfel:1:Stück|Beeren:100:g","Früchte waschen|Schneiden|Anrichten"],
+["Pasta mit Burrata","Mittagessen",25,8,"1473093295043-cdd812d0e601","Vegetarisch","Gluten,Milch","Pasta:120:g|Tomaten:200:g|Burrata:100:g","Pasta kochen|Tomaten garen|Mit Burrata servieren"],
+["Zitronenrisotto","Mittagessen",35,8,"1476124369491-e7addf5db371","Vegetarisch","Milch","Risottoreis:100:g|Parmesan:30:g|Zitrone:1:Stück|Bouillon:300:ml","Reis mit Bouillon garen|Zitrone zugeben|Parmesan unterrühren"],
+["Gemüse-Reispfanne","Mittagessen",25,6,"1512058564366-18510be2db19","Vegan","","Reis:110:g|Peperoni:1:Stück|Zucchetti:160:g","Reis kochen|Gemüse braten|Vermischen"],
+["Poulet-Fajitas","Mittagessen",30,11,"1551504734-5ee1c4a1479b","Fleisch","Gluten","Pouletbrust:170:g|Tortillas:2:Stück|Peperoni:1:Stück","Poulet vollständig garen|Gemüse braten|Tortillas füllen"],
+["Tomaten-Gnocchi","Mittagessen",25,7,"1551183053-bf91a1d81141","Vegetarisch","Gluten,Milch","Gnocchi:220:g|Tomaten:170:g|Mozzarella:90:g","Gnocchi kochen|Tomaten erwärmen|Mozzarella zugeben"],
+["Thai-Gemüsecurry","Abendessen",35,9,"1603894584373-5ac82b2ae398","Vegan","","Kokosmilch:200:ml|Reis:110:g|Broccoli:150:g|Karotten:120:g","Reis kochen|Gemüse mit Kokosmilch garen|Servieren"],
+["Ofenpoulet","Abendessen",45,12,"1532550907401-a500c9a57435","Fleisch","","Pouletbrust:180:g|Kartoffeln:250:g|Karotten:130:g","Ofen auf 200 Grad vorheizen|Gemüse garen|Poulet vollständig durchgaren"],
+["Lachs mit Gemüse","Abendessen",30,14,"1467003909585-2f8a72700288","Fisch","Fisch","Lachs:180:g|Broccoli:170:g|Kartoffeln:230:g","Kartoffeln kochen|Broccoli garen|Lachs vollständig garen"],
+["Vegetarische Lasagne","Abendessen",50,10,"1574894709920-11b28e7367e3","Vegetarisch","Gluten,Milch","Lasagneblätter:100:g|Tomatensauce:200:g|Zucchetti:140:g|Mozzarella:90:g","Gemüse schneiden|Zutaten schichten|Im Ofen durchbacken"],
+["Tofu mit Reis","Abendessen",30,8,"1546069901-ba9599a7e63c","Vegan","Soja","Tofu:170:g|Reis:110:g|Broccoli:170:g","Reis kochen|Broccoli garen|Tofu anbraten"],
+["Schokoladenmousse","Dessert",20,5,"1511715282680-fbf93a50e721","Vegetarisch","Milch","Schokolade:60:g|Rahm:120:ml","Schokolade schmelzen|Rahm schlagen|Mischen und kalt stellen"],
+["Beeren-Crêpes","Dessert",25,5,"1519676867240-f03562e64548","Vegetarisch","Gluten,Milch,Eier","Mehl:80:g|Milch:150:ml|Eier:1:Stück|Beeren:100:g","Teig verrühren|Crêpes ausbacken|Mit Beeren servieren"],
+["Fruchtsalat","Dessert",10,4,"1490474418585-ba9bad8fd0ea","Vegan","","Apfel:1:Stück|Banane:1:Stück|Beeren:100:g","Früchte schneiden|Vermischen|Frisch servieren"],
+["Vanillejoghurt","Dessert",8,4,"1488477181946-6428a0291777","Vegetarisch","Milch","Joghurt:180:g|Beeren:120:g|Vanillezucker:10:g","Joghurt verrühren|Beeren dazugeben|Servieren"]
+];
+const R=raw.map((x,i)=>({
+id:i+1,name:x[0],meal:x[1],min:x[2],cost:x[3],
+img:"https://images.unsplash.com/photo-"+x[4]+"?w=900&q=80",
+diet:x[5],allergens:x[6]?x[6].split(","):[],
+ingredients:x[7].split("|").map(v=>{let a=v.split(":");return {name:a[0],qty:Number(a[1]),unit:a[2]}}),
+steps:x[8].split("|")
+}));
+const defaults={
+setup:false,name:"",diet:"Alles",allergies:[],dislikes:[],cuisines:[],
+store:"Coop",people:2,days:[...DAYS],meals:["Mittagessen","Abendessen"],
+budget:180,occasion:"Kein besonderer Anlass",occasionDay:"Samstag",
+weekStart:"",pendingWeek:"",plan:{},liked:[],lastLiked:[],checks:{}
+};
+let data;
+try{data={...defaults,...JSON.parse(localStorage.getItem("mealio-v2")||"{}")}}
+catch(e){data={...defaults}}
+let view=data.setup?"home":"intro";
+let flow="intro",step=0,category=0,cardIndex=0;
+let recipeId=null,returnView="plan",assignKey=null;
+const $=id=>document.getElementById(id);
+const save=()=>localStorage.setItem("mealio-v2",JSON.stringify(data));
+const esc=x=>String(x??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>"CHF "+Number(n).toFixed(2);
+const btn=(text,action,cls="")=>`<button class="${cls}" onclick="${action}">${text}</button>`;
+function monday(d=new Date()){d=new Date(d.getFullYear(),d.getMonth(),d.getDate());d.setDate(d.getDate()-(d.getDay()+6)%7);return d}
+function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function parseDate(s){let a=s.split("-").map(Number);return new Date(a[0],a[1]-1,a[2])}
+function weekLabel(s){let a=parseDate(s),b=new Date(a);b.setDate(a.getDate()+6);return a.toLocaleDateString("de-CH",{day:"numeric",month:"short"})+" – "+b.toLocaleDateString("de-CH",{day:"numeric",month:"short",year:"numeric"})}
+function setValue(k,v){data[k]=v;save();render()}
+function toggle(k,v){let a=data[k]||[];data[k]=a.includes(v)?a.filter(x=>x!==v):[...a,v];save();render()}
+function chips(k,arr){return arr.map(v=>`<button class="chip ${data[k].includes(v)?"active":""}" onclick="toggle('${k}','${v}')">${esc(v)}</button>`).join("")}
+function options(k,arr){return arr.map(v=>`<button class="choice ${data[k]===v?"active":""}" onclick="setValue('${k}','${v}')">${esc(v)} ${data[k]===v?"✓":""}</button>`).join("")}
+function progress(i,n){return `<div class="eyebrow">Schritt ${i+1} von ${n}</div><div class="progress"><div style="width:${100*(i+1)/n}%"></div></div>`}
+function safe(r){
+if(r.allergens.some(x=>data.allergies.includes(x)))return false;
+if(data.diet==="Vegetarisch"&&["Fleisch","Fisch"].includes(r.diet))return false;
+if(data.diet==="Vegan"&&r.diet!=="Vegan")return false;
+if(data.diet==="Laktosefrei"&&r.allergens.includes("Milch"))return false;
+if(data.diet==="Glutenfrei"&&r.allergens.includes("Gluten"))return false;
+let text=(r.name+" "+r.ingredients.map(x=>x.name).join(" ")).toLowerCase();
+return !data.dislikes.some(x=>text.includes(x.toLowerCase()));
+}
+function activeMeals(){return MEALS.filter(x=>data.meals.includes(x))}
+function slots(){return DAYS.filter(d=>data.days.includes(d)).flatMap(day=>activeMeals().map(meal=>({day,meal,key:day+"|"+meal})))}
+function go(v){view=v;render()}
+
+function startIntro(){flow="intro";step=0;view="wizard";render()}
+function startWeek(){
+flow="week";step=0;view="wizard";
+let start=monday();
+if(data.weekStart){
+let next=parseDate(data.weekStart);next.setDate(next.getDate()+7);
+if(next>start)start=next;
+}
+data.pendingWeek=iso(start);
+data.liked=[];
+save();render();
+}
+function introSteps(){return [
+["Willkommen bei Mealio","Wie dürfen wir dich nennen?"],
+["Deine Ernährung","Wie ernährst du dich?"],
+["Allergien","Welche Allergien oder Unverträglichkeiten hast du?"],
+["Abneigungen","Welche Lebensmittel magst du nicht?"],
+["Lieblingsküchen","Welche Küchen magst du besonders?"]
+]}
+function weekSteps(){return [
+["Supermarkt","Wo möchtest du einkaufen?"],
+["Personen","Für wie viele Personen kochst du?"],
+["Wochentage","An welchen Tagen möchtest du einen Essensplan?"],
+["Mahlzeiten","Welche Mahlzeiten möchtest du planen?"],
+["Wochenbudget","Wie viel möchtest du ausgeben?"],
+["Besonderer Anlass","Gibt es diese Woche ein besonderes Essen?"],
+["Rezepte","Möchtest du gleiche oder neue Rezepte?"]
+]}
+function wizard(){
+let first=flow==="intro",steps=first?introSteps():weekSteps();
+let html="";
+if(first){
+if(step===0)html=`<label class="field">Dein Vorname</label><input value="${esc(data.name)}" placeholder="Vorname" oninput="data.name=this.value;save()">`;
+if(step===1)html=options("diet",["Alles","Vegetarisch","Vegan","Laktosefrei","Glutenfrei"]);
+if(step===2)html=chips("allergies",["Milch","Gluten","Eier","Fisch","Soja","Nüsse","Sesam"]);
+if(step===3)html=chips("dislikes",["Fisch","Lachs","Poulet","Schweinefleisch","Rindfleisch","Tofu","Pilze","Zwiebeln","Eier","Broccoli","Karotten","Tomaten"]);
+if(step===4)html=chips("cuisines",["Italienisch","Schweizerisch","Asiatisch","Mexikanisch","Mediterran","Indisch","Französisch","International"]);
+}else{
+if(step===0)html=options("store",STORES);
+if(step===1)html=`<div class="row" style="justify-content:center;margin:25px 0">${btn("−","setValue('people',Math.max(1,data.people-1))","alt")}<div class="big" style="min-width:75px">${data.people}</div>${btn("+","setValue('people',Math.min(20,data.people+1))","alt")}</div>`;
+if(step===2)html=chips("days",DAYS);
+if(step===3)html=chips("meals",MEALS);
+if(step===4)html=`<div class="big" id="budgetDisplay">${money(data.budget)}</div><input type="range" min="30" max="800" step="10" value="${data.budget}" oninput="data.budget=Number(this.value);document.getElementById('budgetDisplay').textContent=money(data.budget);save()">`;
+if(step===5){
+html=options("occasion",["Kein besonderer Anlass","Weihnachtsessen","Geburtstag","Gäste eingeladen","Festessen","Anderer Anlass"]);
+if(data.occasion!=="Kein besonderer Anlass")html+=`<label class="field">An welchem Tag?</label><select onchange="setValue('occasionDay',this.value)">${DAYS.map(d=>`<option ${data.occasionDay===d?"selected":""}>${d}</option>`).join("")}</select>`;
+}
+if(step===6)html=`
+<button class="choice" onclick="sameRecipes()"><b>🔁 Gleiche Rezepte</b><br><small>Gerichte aus der letzten Woche übernehmen</small></button>
+<button class="choice" onclick="newRecipes()"><b>✨ Neue Rezepte</b><br><small>Rezeptbilder ansehen und nach links oder rechts wischen</small></button>`;
+}
+let back=step===0?(first?"view='intro';render()":"view='home';render()"):"step--;render()";
+let bottom=step===6&&!first
+?btn("← Zurück",back,"alt")
+:`<div class="row" style="margin-top:22px">${btn("← Zurück",back,"alt")}${btn(step===steps.length-1?"Fertig ✓":"Weiter →","advanceWizard()","grow")}</div>`;
+return `<div class="card">${progress(step,steps.length)}<h1>${steps[step][0]}</h1><p class="muted">${steps[step][1]}</p>${html}${bottom}
+${first&&step===2?'<p class="note">Die Allergieprüfung ist eine unvollständige Demo. Bitte Zutaten und Verpackungen immer selbst kontrollieren.</p>':""}
+</div>`;
+}
+function advanceWizard(){
+if(flow==="intro"&&step===0&&!data.name.trim()){alert("Bitte gib deinen Vornamen ein.");return}
+if(flow==="week"&&step===2&&!data.days.length){alert("Wähle mindestens einen Tag.");return}
+if(flow==="week"&&step===3&&!data.meals.length){alert("Wähle mindestens eine Mahlzeit.");return}
+if(flow==="intro"&&step===4){data.setup=true;save();startWeek();return}
+if(flow==="week"&&step===6)return;
+step++;render();
+}
+function newRecipes(){
+data.liked=[];category=0;cardIndex=0;
+view="swipe";save();render();
+}
+function sameRecipes(){
+if(!data.lastLiked.length){
+alert("Du hast noch keine Rezepte aus einer früheren Woche. Wähle zuerst neue Rezepte.");
+newRecipes();return;
+}
+data.liked=[...data.lastLiked];
+save();view="arrange";render();
+}
+function categories(){
+return activeMeals().map(meal=>({meal,recipes:R.filter(r=>r.meal===meal&&safe(r))}));
+}
+function swipe(){
+let cats=categories();
+while(category<cats.length&&cardIndex>=cats[category].recipes.length){category++;cardIndex=0}
+if(category>=cats.length){view="arrange";return arrange()}
+let c=cats[category],r=c.recipes[cardIndex];
+return `<div class="card">
+<div class="eyebrow">Neue Rezepte entdecken</div>
+${progress(category,cats.length)}
+<h1>${esc(c.meal)}</h1>
+<p class="muted">Wische nach rechts für „Gefällt mir“ und nach links für „Nein“.</p>
+<p class="muted">Rezept ${cardIndex+1} von ${c.recipes.length}</p>
+<div class="recipe" id="swipeCard">
+<img class="photo" src="${r.img}" alt="${esc(r.name)}" onerror="this.style.display='none'">
+<div class="recipebody">
+<div class="badge">${r.min} Minuten · ca. ${money(r.cost)} pro Person</div>
+<h2>${esc(r.name)}</h2>
+${btn("Rezept ansehen","showDetails("+r.id+",'swipe')","alt full")}
+</div></div>
+<div class="row">
+${btn("✕ Nein","rate(false)","alt grow")}
+${btn("♥ Gefällt mir","rate(true)","grow")}
+</div>
+<p class="muted" style="text-align:center">${data.liked.length} Rezepte ausgewählt</p>
+${btn("← Zurück","backSwipe()","ghost")}
+</div>`;
+}
+function rate(yes){
+let cats=categories(),r=cats[category]?.recipes[cardIndex];
+if(!r)return;
+if(yes&&!data.liked.includes(r.id))data.liked.push(r.id);
+if(!yes)data.liked=data.liked.filter(id=>id!==r.id);
+cardIndex++;
+save();render();
+}
+function backSwipe(){
+if(cardIndex>0)cardIndex--;
+else if(category>0){
+category--;
+cardIndex=Math.max(0,categories()[category].recipes.length-1);
+}else{view="wizard";step=6}
+render();
+}
+function arrange(){
+return `<div class="card">
+<div class="eyebrow">Letzter Schritt</div>
+<div class="progress"><div style="width:100%"></div></div>
+<h1>Deine Rezepte sind ausgewählt! 🎉</h1>
+<p>Du hast <b>${data.liked.length} Rezepte</b> ausgewählt.</p>
+${data.liked.length===0?'<p class="note">Bitte wähle mindestens ein Rezept.</p>':""}
+<h2>Wer soll die Gerichte verteilen?</h2>
+<button class="choice" ${data.liked.length?"":"disabled"} onclick="finishPlan('auto')"><b>✨ Mealio ordnet automatisch</b><br><small>Die ausgewählten Rezepte werden auf die Wochentage verteilt.</small></button>
+<button class="choice" ${data.liked.length?"":"disabled"} onclick="finishPlan('manual')"><b>📅 Ich ordne selbst</b><br><small>Du entscheidest, wann du welches Gericht isst.</small></button>
+${btn("← Neue Rezepte auswählen","newRecipes()","alt full")}
+</div>`;
+}
+function finishPlan(mode){
+if(!data.liked.length){alert("Bitte wähle mindestens ein Rezept.");return}
+data.plan={};
+if(mode==="auto"){
+let count={};
+slots().forEach(s=>{
+let pool=R.filter(r=>data.liked.includes(r.id)&&r.meal===s.meal);
+if(pool.length){
+let n=count[s.meal]||0;
+data.plan[s.key]=pool[n%pool.length].id;
+count[s.meal]=n+1;
+}
+});
+}
+data.weekStart=data.pendingWeek||iso(monday());
+data.lastLiked=[...data.liked];
+data.checks={};
+save();
+view=mode==="manual"?"manual":"plan";
+render();
+}
+function manual(){
+return `<div class="card"><h1>📅 Selbst anordnen</h1>
+<p>Tippe auf „Auswählen“, um ein Gericht zuzuordnen.</p>
+${slots().map(s=>{
+let r=R.find(x=>x.id===data.plan[s.key]);
+return `<div class="mini"><div class="grow"><b>${s.day}</b><br><small>${s.meal}</small><br>${r?esc(r.name):"Noch kein Rezept"}</div>${btn("Auswählen","assignKey='"+s.key+"';go('assign')","alt")}</div>`;
+}).join("")}
+${btn("Wochenplan öffnen","go('plan')","full")}</div>`;
+}
+function assign(){
+let meal=assignKey.split("|")[1];
+let pool=R.filter(r=>data.liked.includes(r.id)&&r.meal===meal);
+return `<div class="card"><h1>${esc(assignKey.replace("|"," · "))}</h1>
+${pool.map(r=>`<button class="choice" onclick="data.plan[assignKey]=${r.id};save();go('manual')">${esc(r.name)}<br><small>${r.min} Minuten</small></button>`).join("")||"<p>Für diese Mahlzeit hast du kein Rezept ausgewählt.</p>"}
+${btn("← Zurück","go('manual')","alt")}</div>`;
+}
+function showDetails(id,from){
+recipeId=id;returnView=from;view="details";render();
+}
+function details(){
+let r=R.find(x=>x.id===recipeId);
+if(!r)return `<div class="card">${btn("Zurück","go('plan')")}</div>`;
+return `<div class="recipe"><img class="photo" src="${r.img}" alt="${esc(r.name)}">
+<div class="recipebody">
+<div class="eyebrow">${r.meal}</div><h1>${esc(r.name)}</h1>
+<p>⏱ ${r.min} Minuten · 👥 ${data.people} Personen</p>
+<h2>Zutaten</h2>
+${r.ingredients.map(i=>`<div class="mini"><span class="grow">${esc(i.name)}</span><b>${i.qty*data.people} ${esc(i.unit)}</b></div>`).join("")}
+<h2>Zubereitung</h2><ol>${r.steps.map(x=>`<li style="padding:8px 0">${esc(x)}</li>`).join("")}</ol>
+<p class="note">Erfasste Allergene: ${r.allergens.map(esc).join(", ")||"keine angegeben"}. Nicht vollständig überprüft.</p>
+${btn("← Zurück","go(returnView)","alt full")}
+</div></div>`;
+}
+
+function total(){return Object.values(data.plan).reduce((n,id)=>{let r=R.find(x=>x.id===id);return n+(r?r.cost*data.people:0)},0)}
+function items(){
+let out={};
+Object.values(data.plan).forEach(id=>{
+let r=R.find(x=>x.id===id);
+if(!r)return;
+r.ingredients.forEach(i=>{
+let key=i.name+"|"+i.unit;
+if(!out[key])out[key]={name:i.name,qty:0,unit:i.unit};
+out[key].qty+=i.qty*data.people;
+});
+});
+return Object.entries(out).sort((a,b)=>a[1].name.localeCompare(b[1].name,"de"));
+}
+function reminder(){
+if(!data.weekStart)return "";
+let end=parseDate(data.weekStart);end.setDate(end.getDate()+6);
+let today=new Date();today.setHours(0,0,0,0);
+let diff=Math.round((end-today)/86400000);
+if(diff>2)return "";
+return `<div class="card reminder"><h3>🔔 Deine Woche endet bald</h3>
+<p>${diff<0?"Dein letzter Wochenplan ist abgelaufen.":"Dein Essensplan endet am Sonntag. Plane jetzt die nächste Woche."}</p>
+${btn("Nächste Woche planen","startWeek()","full")}</div>`;
+}
+function home(){
+let has=!!data.weekStart;
+return `<div class="card"><div class="eyebrow">Dein persönlicher Essensplan</div>
+<h1>Hallo, ${esc(data.name||"du")}! 👋</h1>
+<p>Willkommen bei Mealio.</p>
+${has?`<div class="stat"><b>📅 ${weekLabel(data.weekStart)}</b><br><small>${esc(data.store)} · ${data.people} Personen</small></div>`:"<p>Du hast noch keinen Wochenplan erstellt.</p>"}
+</div>
+${has?reminder():""}
+<div class="grid">
+<div class="card"><h3>📅 Wochenplan</h3><p class="muted">Alle deine Gerichte</p>${btn("Öffnen","go('plan')","full")}</div>
+<div class="card"><h3>🛒 Einkauf</h3><p class="muted">Deine Einkaufsliste</p>${btn("Öffnen","go('shop')","full")}</div>
+</div>
+<div class="card"><h2>Nächste Woche planen</h2>
+<p>Deine Allergien, Abneigungen und Lieblingsküchen bleiben gespeichert.</p>
+${btn("Neue Woche starten","startWeek()","full")}
+</div>
+<div class="card"><h2>Dein Budget</h2>
+<div class="grid"><div class="stat"><small>Budget</small><h3>${money(data.budget)}</h3></div>
+<div class="stat"><small>Geschätzte Kosten</small><h3>${money(total())}</h3></div></div>
+<p class="muted">Nur Schätzwerte, keine aktuellen Supermarktpreise.</p></div>`;
+}
+function plan(){
+if(!data.weekStart)return `<div class="card"><h2>Noch kein Wochenplan</h2>${btn("Jetzt planen","startWeek()")}</div>`;
+return `<div class="card"><div class="eyebrow">Dein Wochenplan</div>
+<h1>📅 ${weekLabel(data.weekStart)}</h1>
+<p>${esc(data.store)} · ${data.people} Personen</p>
+<div class="grid"><div class="stat"><small>Budget</small><h3>${money(data.budget)}</h3></div><div class="stat"><small>Geschätzte Kosten</small><h3>${money(total())}</h3></div></div>
+${data.occasion!=="Kein besonderer Anlass"?`<p>🎉 ${esc(data.occasion)} · ${esc(data.occasionDay)}</p>`:""}
+</div>
+${DAYS.filter(d=>data.days.includes(d)).map(day=>`
+<div class="card"><h2>${day}</h2>
+${activeMeals().map(meal=>{
+let key=day+"|"+meal,r=R.find(x=>x.id===data.plan[key]);
+return `<div class="mini">
+${r?`<img src="${r.img}" alt="${esc(r.name)}">`:""}
+<div class="grow"><div class="badge">${meal}</div><b>${r?esc(r.name):"Noch kein Rezept"}</b>${r?`<br><small>${r.min} Minuten</small>`:""}</div>
+${r?btn("Ansehen","showDetails("+r.id+",'plan')","alt"):btn("Wählen","assignKey='"+key+"';go('assign')","alt")}
+</div>`;
+}).join("")}</div>`).join("")}
+<div class="card">${btn("🛒 Einkaufsliste","go('shop')","full")}<p></p>${btn("Neue Woche planen","startWeek()","alt full")}</div>`;
+}
+function shop(){
+let list=items();
+return `<div class="card"><div class="eyebrow">Dein Einkauf</div><h1>🛒 Einkaufsliste</h1>
+<p>${esc(data.store)} · ${data.people} Personen</p>
+<p>Geschätzte Rezeptkosten: <b>${money(total())}</b></p>
+<p class="note">Die Preise sind Schätzwerte. Verpackungsgrössen und Ladenpreise können abweichen.</p>
+${list.length?list.map(([key,i])=>`
+<label class="check ${data.checks[key]?"done":""}">
+<input type="checkbox" ${data.checks[key]?"checked":""} onchange="checkItem('${esc(key)}',this.checked)">
+<span class="grow">${esc(i.name)}</span><b>${i.qty} ${esc(i.unit)}</b></label>`).join(""):"<p>Plane zuerst deine Rezepte.</p>"}
+<p></p>${btn("📋 Liste kopieren","copyShop()","full")}
+<p></p>${btn("🖨️ Drucken / PDF","window.print()","alt full")}</div>`;
+}
+function checkItem(key,checked){data.checks[key]=checked;save();render()}
+function copyShop(){
+let text="Mealio Einkaufsliste\n"+data.store+"\n\n"+items().map(([k,i])=>i.name+": "+i.qty+" "+i.unit).join("\n");
+if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>alert("Kopiert!")).catch(()=>prompt("Liste kopieren:",text));
+else prompt("Liste kopieren:",text);
+}
+function settings(){
+return `<div class="card"><div class="eyebrow">Persönliche Einstellungen</div><h1>⚙️ Einstellungen</h1>
+<p class="muted">Diese Angaben bleiben für die nächsten Wochen gespeichert.</p>
+<label class="field">Vorname</label><input value="${esc(data.name)}" oninput="data.name=this.value;save()">
+<h3>Ernährungsform</h3>${options("diet",["Alles","Vegetarisch","Vegan","Laktosefrei","Glutenfrei"])}
+<h3>Allergien</h3>${chips("allergies",["Milch","Gluten","Eier","Fisch","Soja","Nüsse","Sesam"])}
+<h3>Lebensmittel, die ich nicht mag</h3>${chips("dislikes",["Fisch","Lachs","Poulet","Schweinefleisch","Rindfleisch","Tofu","Pilze","Zwiebeln","Eier","Broccoli","Karotten","Tomaten"])}
+<h3>Lieblingsküchen</h3>${chips("cuisines",["Italienisch","Schweizerisch","Asiatisch","Mexikanisch","Mediterran","Indisch","Französisch","International"])}
+<p class="note">Allergiefilter sind nicht vollständig. Kontrolliere Lebensmittel immer selbst.</p>
+${btn("✓ Speichern","save();go('home')","full")}
+</div>`;
+}
+function intro(){
+return `<div class="card" style="text-align:center;padding:35px 20px">
+<div style="font-size:65px">🌿</div>
+<h1>Willkommen bei Mealio</h1>
+<p>Dein persönlicher Essensplan mit Rezeptbildern, Wochenplanung und Einkaufsliste.</p>
+<p class="muted">Einmal Vorlieben einstellen. Jede Woche neue Rezepte entdecken.</p>
+${btn("Jetzt starten","startIntro()","full")}</div>`;
+}
+function enableSwipe(){
+let el=$("swipeCard");if(!el)return;
+let x=0,y=0;
+el.addEventListener("touchstart",e=>{x=e.touches[0].clientX;y=e.touches[0].clientY},{passive:true});
+el.addEventListener("touchend",e=>{
+let dx=e.changedTouches[0].clientX-x,dy=e.changedTouches[0].clientY-y;
+if(Math.abs(dx)>70&&Math.abs(dx)>Math.abs(dy)*1.3)rate(dx>0);
+},{passive:true});
+}
+function render(){
+let pages={intro,wizard,swipe,arrange,manual,assign,details,home,plan,shop,settings};
+$("app").innerHTML=(pages[view]||home)();
+$("nav").classList.toggle("hidden",!data.setup||["wizard","swipe","arrange","manual","assign","details"].includes(view));
+document.querySelectorAll(".nav button").forEach(b=>b.classList.remove("active"));
+let active=$("nav-"+view);if(active)active.classList.add("active");
+window.scrollTo(0,0);
+if(view==="swipe")enableSwipe();
+}
+render();
+</script>
+</body>
+</html>
+
