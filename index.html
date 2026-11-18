@@ -1,7 +1,7 @@
 
-<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#19764c"><title>Mealio – Dein Wochenplan (Version 4)</title><style>
+<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#19764c"><title>Mealio – Dein Wochenplan</title><style>
 :root{--green:#19764c;--ink:#193d2a;--bg:#f3f8f4;--muted:#64786a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e0e9e1;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 18px}.logo{font-size:25px;font-weight:800;color:var(--green)}main{max-width:680px;margin:auto;padding:18px 14px 110px}.card{background:white;border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 3px 14px #12341b0a}h1{font-size:26px;margin:9px 0 12px}h2{font-size:21px}h3{font-size:17px}p{line-height:1.5}.muted,small{color:var(--muted)}.eyebrow{color:var(--green);font-size:12px;letter-spacing:1px;font-weight:800;text-transform:uppercase}button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:12px;padding:12px 14px;background:var(--green);color:#fff}button:disabled{opacity:.4;cursor:not-allowed}.alt{background:#e7f2e9;color:var(--green)}.ghost{background:transparent;color:var(--green)}.full{width:100%}.row{display:flex;gap:9px;align-items:center}.grow{flex:1;min-width:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{display:block;width:100%;text-align:left;background:#f8fbf8;color:var(--ink);border:2px solid #e0eae1;margin:9px 0;padding:14px}.choice.active{background:#e7f5eb;border-color:var(--green)}.chip{display:inline-block;background:white;color:var(--ink);border:1px solid #d4e4d7;border-radius:25px;padding:10px 12px;margin:4px;font-weight:500}.chip.active{background:#dff2e4;border-color:var(--green)}input,select{font:inherit;width:100%;padding:12px;border:1px solid #ceded1;border-radius:11px}input[type=range],input[type=checkbox]{accent-color:var(--green)}label.field{display:block;font-weight:700;margin:15px 0 7px}.progress{height:7px;background:#e1ece3;border-radius:20px;overflow:hidden;margin:12px 0}.progress>div{height:100%;background:var(--green)}.photo{width:100%;height:235px;object-fit:cover;background:#e3eee5;display:block}.recipe{border:1px solid #e1eae3;border-radius:17px;overflow:hidden;margin:13px 0}.recipebody{padding:16px}.mini{display:flex;align-items:center;gap:11px;border-bottom:1px solid #edf1ed;padding:12px 0}.mini img{width:76px;height:67px;object-fit:cover;border-radius:10px}.stat{background:#eff7f0;padding:13px;border-radius:13px}.note{background:#fff5dc;border-radius:12px;padding:13px;font-size:13px;line-height:1.5}.nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #dce8df;display:flex;padding:8px 5px max(8px,env(safe-area-inset-bottom));z-index:5}.nav button{flex:1;background:transparent;color:#69806e;padding:8px 2px;font-size:12px}.nav button.active{background:#e7f4ea;color:var(--green)}.hidden{display:none!important}.check{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #edf1ed}.check input{width:22px;height:22px;flex:none}.check.done span{text-decoration:line-through;color:#91a295}.big{font-size:36px;font-weight:800;text-align:center}.empty{padding:16px;border:1px dashed #c8d9cb;border-radius:12px}.badge{color:var(--green);font-size:12px;font-weight:800}.error{background:#fff1ed;color:#8b2b1d;padding:18px;border-radius:12px;white-space:pre-wrap}@media print{header,.nav,button{display:none!important}main{padding:0}.card{box-shadow:none;border:1px solid #ddd}}
-</style></head><body><header><div class="logo">🌿 Mealio</div><button class="ghost" id="topSettings">⚙️</button></header><main id="app"><div class="card"><h1>🌿 Willkommen bei Mealio</h1><p>Dein Essensplan wird geladen …</p></div></main><nav id="nav" class="nav hidden"><button data-nav="home">🏠<br>Start</button><button data-nav="plan">📅<br>Wochenplan</button><button data-nav="shop">🛒<br>Einkauf</button><button data-nav="settings">⚙️<br>Einstellungen</button></nav><script>
+</style></head><body><header><div class="logo">🌿 Mealio</div><button class="ghost" id="topSettings" aria-label="Einstellungen">⚙️</button></header><main id="app"><div class="card"><h1>🌿 Willkommen bei Mealio</h1><p>Falls die App hier stehen bleibt, lade die Seite erneut und prüfe, ob JavaScript aktiviert ist.</p></div></main><nav id="nav" class="nav hidden"><button data-nav="home">🏠<br>Start</button><button data-nav="plan">📅<br>Wochenplan</button><button data-nav="shop">🛒<br>Einkauf</button><button data-nav="settings">⚙️<br>Einstellungen</button></nav><script>
 'use strict';
 const DAYS=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
 const MEALS=['Frühstück','Vorspeise','Mittagessen','Abendessen','Dessert'];
@@ -37,9 +37,14 @@ const R=raw.map((a,i)=>({id:i+1,name:a[0],meal:a[1],min:a[2],cost:a[3],img:'http
 const KEY='mealio-v4';
 const defaults=()=>({setup:false,name:'',diet:'Alles',allergies:[],dislikes:[],cuisines:[],store:'Coop',people:2,days:[...DAYS],meals:['Mittagessen','Abendessen'],budget:180,occasion:'Kein besonderer Anlass',occasionDay:'Samstag',weekStart:'',pendingWeek:'',plan:{},liked:[],lastLiked:[],checks:{}});
 let data=defaults();try{const old=JSON.parse(localStorage.getItem(KEY)||'null');if(old&&typeof old==='object'){data={...data,...old};for(const k of ['allergies','dislikes','cuisines','days','meals','liked','lastLiked'])if(!Array.isArray(data[k]))data[k]=[];for(const k of ['plan','checks'])if(!data[k]||typeof data[k]!=='object')data[k]={};}}catch(e){}
+data.name=typeof data.name==='string'?data.name:'';
+data.people=Math.max(1,Math.min(20,Math.trunc(Number(data.people))||2));
+data.budget=Math.max(30,Math.min(800,Number(data.budget)||180));
+if(!/^\d{4}-\d{2}-\d{2}$/.test(data.weekStart)||!Number.isFinite(+parseDate(data.weekStart)))data.weekStart='';
+let weekSnapshot=null, assignReturn='manual';
 let view=data.setup?'home':'intro',flow='intro',step=0,category=0,cardIndex=0,recipeId=null,returnView='plan',assignKey=null;
 const $=id=>document.getElementById(id);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=n=>'CHF '+Number(n).toFixed(2);const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){}};
+const money=n=>'CHF '+Number(n).toFixed(2);const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(weekSnapshot ? {...data,...weekSnapshot} : data))}catch(e){}};
 const button=(label,action,cls='')=>`<button class="${cls}" data-action="${esc(action)}">${label}</button>`;
 
 function monday(d=new Date()){
@@ -94,10 +99,18 @@ return DAYS.filter(d=>data.days.includes(d)).flatMap(day=>activeMeals().map(meal
 function go(v){
 view=v;render();
 }
+function leaveWeek(){
+if(!weekSnapshot)return;
+Object.assign(data,weekSnapshot);
+weekSnapshot=null;
+}
 function startIntro(){
 flow='intro';step=0;view='wizard';render();
 }
 function startWeek(){
+leaveWeek();
+const fields=['store','people','days','meals','budget','occasion','occasionDay','pendingWeek','liked'];
+weekSnapshot=Object.fromEntries(fields.map(key=>[key,data[key]]));
 flow='week';step=0;view='wizard';
 let start=monday();
 if(data.weekStart){
@@ -144,7 +157,7 @@ if(step===0)html=options('store',STORES);
 if(step===1)html=`<div class="row" style="justify-content:center;margin:25px 0">${button('−','peopleMinus','alt')}<div class="big" style="min-width:75px">${data.people}</div>${button('+','peoplePlus','alt')}</div>`;
 if(step===2)html=chips('days',DAYS);
 if(step===3)html=chips('meals',MEALS);
-if(step===4)html=`<div class="big">${money(data.budget)}</div><input type="range" min="30" max="800" step="10" value="${data.budget}" data-input="budget">`;
+if(step===4)html=`<div class="big" id="budgetValue">${money(data.budget)}</div><input aria-label="Wochenbudget" type="range" min="30" max="800" step="10" value="${data.budget}" data-input="budget">`;
 if(step===5){
 html=options('occasion',OCCASIONS);
 if(data.occasion!=='Kein besonderer Anlass'){
@@ -162,7 +175,7 @@ return `<div class="card">${progress(step,steps.length)}<h1>${steps[step][0]}</h
 }
 function backWizard(){
 if(step>0){step--;render();return;}
-view=flow==='intro'?'intro':'home';render();
+leaveWeek();view=flow==='intro'?'intro':'home';render();
 }
 function advanceWizard(){
 if(flow==='intro'&&step===0&&!data.name.trim()){
@@ -185,11 +198,12 @@ data.liked=[];category=0;cardIndex=0;
 view='swipe';save();render();
 }
 function sameRecipes(){
-if(!data.lastLiked.length){
+const previous=R.filter(r=>data.lastLiked.includes(r.id)&&activeMeals().includes(r.meal)&&safe(r));
+if(!previous.length){
 alert('Du hast noch keine Rezepte aus einer früheren Woche. Wähle zuerst neue Rezepte.');
 newRecipes();return;
 }
-data.liked=[...data.lastLiked];
+data.liked=previous.map(r=>r.id);
 save();view='arrange';render();
 }
 function categories(){
@@ -237,11 +251,14 @@ cardIndex++;save();render();
 }
 function backSwipe(){
 if(cardIndex>0)cardIndex--;
-else if(category>0){
-category--;
-cardIndex=Math.max(0,categories()[category].recipes.length-1);
+else {
+const previous=categories().slice(0,category).map(c=>Boolean(c.recipes.length)).lastIndexOf(true);
+if(previous>=0){
+category=previous;
+cardIndex=categories()[category].recipes.length-1;
 }else{
 view='wizard';step=6;
+}
 }
 render();
 }
@@ -256,6 +273,7 @@ ${data.liked.length===0?'<p class="note">Bitte wähle mindestens ein Rezept.</p>
 <button class="choice" ${data.liked.length?'':'disabled'} data-action="finishAuto"><b>✨ Mealio ordnet automatisch</b><br><small>Die ausgewählten Rezepte werden auf die Wochentage verteilt.</small></button>
 <button class="choice" ${data.liked.length?'':'disabled'} data-action="finishManual"><b>📅 Ich ordne selbst</b><br><small>Du entscheidest, wann du welches Gericht isst.</small></button>
 ${button('← Neue Rezepte auswählen','newRecipes','alt full')}
+${button('Planungseinstellungen ändern','editWeek','ghost full')}
 </div>`;
 }
 function finishPlan(mode){
@@ -275,6 +293,7 @@ count[s.meal]=n+1;
 data.weekStart=data.pendingWeek||iso(monday());
 data.lastLiked=[...data.liked];
 data.checks={};
+weekSnapshot=null;
 save();
 view=mode==='manual'?'manual':'plan';
 render();
@@ -291,10 +310,12 @@ ${button('Wochenplan öffnen','go:plan','full')}</div>`;
 function assign(){
 if(!assignKey)return `<div class="card">${button('Zurück','go:plan')}</div>`;
 const meal=assignKey.split('|')[1];
-const pool=R.filter(r=>data.liked.includes(r.id)&&r.meal===meal);
+const eligible=R.filter(r=>r.meal===meal&&safe(r));
+const selected=eligible.filter(r=>data.lastLiked.includes(r.id));
+const pool=selected.length?selected:eligible;
 return `<div class="card"><h1>${esc(assignKey.replace('|',' · '))}</h1>
 ${pool.map(r=>`<button class="choice" data-action="choose:${r.id}">${esc(r.name)}<br><small>${r.min} Minuten</small></button>`).join('')||'<p>Für diese Mahlzeit hast du kein Rezept ausgewählt.</p>'}
-${button('← Zurück','go:manual','alt')}</div>`;
+${button('← Zurück','go:'+assignReturn,'alt')}</div>`;
 }
 function showDetails(id,from){
 recipeId=id;returnView=from;view='details';render();
@@ -302,7 +323,7 @@ recipeId=id;returnView=from;view='details';render();
 function details(){
 const r=R.find(x=>x.id===recipeId);
 if(!r)return `<div class="card">${button('Zurück','go:plan')}</div>`;
-return `<div classrecipe="recipe" class="recipe">
+return `<div class="recipe">
 <img class="photo" src="${r.img}" alt="${esc(r.name)}">
 <div class="recipebody">
 <div class="eyebrow">${esc(r.meal)}</div><h1>${esc(r.name)}</h1>
@@ -496,7 +517,7 @@ ${chips('dislikes',DISLIKES)}
 <h3>Lieblingsküchen</h3>
 ${chips('cuisines',CUISINES)}
 <p class="note">Die Allergiefilter sind nicht vollständig. Kontrolliere Lebensmittel immer selbst.</p>
-${button('✓ Speichern','go:home','full')}
+${button('✓ Speichern',data.setup?'go:home':'go:intro','full')}
 </div>`;
 }
 function enableSwipe(){
@@ -521,6 +542,10 @@ if(action==='startWeek')return startWeek();
 if(action==='backWizard')return backWizard();
 if(action==='advanceWizard')return advanceWizard();
 if(action==='newRecipes')return newRecipes();
+if(action==='editWeek'){
+step=3;
+return go('wizard');
+}
 if(action==='sameRecipes')return sameRecipes();
 if(action==='rateYes')return rate(true);
 if(action==='rateNo')return rate(false);
@@ -533,6 +558,7 @@ if(action==='peopleMinus')return setValue('people',Math.max(1,data.people-1));
 if(action==='peoplePlus')return setValue('people',Math.min(20,data.people+1));
 if(action.startsWith('go:'))return go(action.slice(3));
 if(action.startsWith('assign:')){
+assignReturn=view;
 assignKey=action.slice(7);
 return go('assign');
 }
@@ -540,7 +566,7 @@ if(action.startsWith('choose:')){
 if(!assignKey)return go('plan');
 data.plan[assignKey]=Number(action.slice(7));
 save();
-return go('manual');
+return go(assignReturn);
 }
 if(action.startsWith('details:')){
 return showDetails(Number(action.slice(8)),view);
@@ -566,7 +592,7 @@ console.error(error);
 }
 document.addEventListener('click',event=>{
 const nav=event.target.closest('[data-nav]');
-if(nav){go(nav.dataset.nav);return;}
+if(nav){leaveWeek();go(nav.dataset.nav);return;}
 const toggleButton=event.target.closest('[data-toggle]');
 if(toggleButton){
 toggle(toggleButton.dataset.toggle,toggleButton.dataset.value);
@@ -588,7 +614,7 @@ if(!key)return;
 if(key==='budget'){
 data.budget=Number(event.target.value);
 save();
-render();
+$('budgetValue').textContent=money(data.budget);
 return;
 }
 data[key]=event.target.value;
@@ -605,7 +631,7 @@ data.occasionDay=event.target.value;
 save();
 }
 });
-$('topSettings').addEventListener('click',()=>go('settings'));
+$('topSettings').addEventListener('click',()=>{leaveWeek();go('settings');});
 window.addEventListener('error',event=>{
 console.error('Mealio Fehler:',event.message);
 });
