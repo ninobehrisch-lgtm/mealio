@@ -31,15 +31,19 @@ const raw=[
 ['Schokoladenmousse','Dessert',20,5,'1511715282680-fbf93a50e721','Vegetarisch','Milch','Schokolade:60:g|Rahm:120:ml','Schokolade schmelzen|Rahm schlagen|Mischen und kalt stellen'],
 ['Beeren-Crêpes','Dessert',25,5,'1519676867240-f03562e64548','Vegetarisch','Gluten,Milch,Eier','Mehl:80:g|Milch:150:ml|Eier:1:Stück|Beeren:100:g','Teig verrühren|Crêpes ausbacken|Mit Beeren servieren'],
 ['Fruchtsalat','Dessert',10,4,'1490474418585-ba9bad8fd0ea','Vegan','','Apfel:1:Stück|Banane:1:Stück|Beeren:100:g','Früchte schneiden|Vermischen|Frisch servieren'],
-['Vanillejoghurt','Dessert',8,4,'1488477181946-6428a0291777','Vegetarisch','Milch','Joghurt:180:g|Beeren:120:g|Vanillezucker:10:g','Joghurt verrühren|Beeren dazugeben|Servieren']
+['Vanillejoghurt','Dessert',8,4,'1488477181946-6428a0291777','Vegetarisch','Milch','Joghurt:180:g|Beeren:120:g|Vanillezucker:10:g','Joghurt verrühren|Beeren dazugeben|Servieren'],
+['Linsen mit Reis','Mittagessen',25,2,'','Vegan','','Rote Linsen:80:g|Reis:80:g|Karotten:100:g','Reis nach Packungsanleitung kochen|Karotten würfeln und mit den Linsen in Wasser weich kochen|Linsen abschmecken und mit Reis servieren'],
+['Pasta mit Tomatensauce','Mittagessen',20,2.5,'','Vegan','Gluten','Pasta:120:g|Passierte Tomaten:180:g|Karotten:80:g','Pasta nach Packungsanleitung kochen|Karotten fein raffeln und in den passierten Tomaten weich köcheln|Sauce abschmecken und mit der Pasta mischen'],
+['Kartoffeln mit Kichererbsen','Abendessen',35,2.5,'','Vegan','','Kartoffeln:300:g|Kichererbsen:150:g|Karotten:100:g','Kartoffeln und Karotten würfeln und bei 200 °C mit etwas Öl rösten|Vorgegarte Kichererbsen abspülen und für die letzten 10 Minuten dazugeben|Abschmecken und servieren'],
+['Linsen-Kartoffel-Eintopf','Abendessen',30,2,'','Vegan','','Rote Linsen:80:g|Kartoffeln:250:g|Karotten:100:g','Kartoffeln und Karotten klein schneiden|Mit den Linsen in Wasser weich köcheln|Abschmecken und heiss servieren']
 ];
-const R=raw.map((a,i)=>({id:i+1,name:a[0],meal:a[1],min:a[2],cost:a[3],img:'https://images.unsplash.com/photo-'+a[4]+'?w=800&q=75',diet:a[5],allergens:a[6]?a[6].split(','):[],ingredients:a[7].split('|').map(v=>{const p=v.split(':');return {name:p[0],qty:Number(p[1]),unit:p[2]}}),steps:a[8].split('|')}));
+const R=raw.map((a,i)=>({id:i+1,name:a[0],meal:a[1],min:a[2],cost:a[3],img:a[4]?'https://images.unsplash.com/photo-'+a[4]+'?w=800&q=75':'',diet:a[5],allergens:a[6]?a[6].split(','):[],ingredients:a[7].split('|').map(v=>{const p=v.split(':');return {name:p[0],qty:Number(p[1]),unit:p[2]}}),steps:a[8].split('|')}));
 const KEY='mealio-v4';
 const defaults=()=>({setup:false,name:'',diet:'Alles',allergies:[],dislikes:[],cuisines:[],store:'Coop',people:2,days:[...DAYS],meals:['Mittagessen','Abendessen'],budget:180,occasion:'Kein besonderer Anlass',occasionDay:'Samstag',weekStart:'',pendingWeek:'',plan:{},liked:[],lastLiked:[],checks:{}});
 let data=defaults();try{const old=JSON.parse(localStorage.getItem(KEY)||'null');if(old&&typeof old==='object'){data={...data,...old};for(const k of ['allergies','dislikes','cuisines','days','meals','liked','lastLiked'])if(!Array.isArray(data[k]))data[k]=[];for(const k of ['plan','checks'])if(!data[k]||typeof data[k]!=='object')data[k]={};}}catch(e){}
 data.name=typeof data.name==='string'?data.name:'';
 data.people=Math.max(1,Math.min(20,Math.trunc(Number(data.people))||2));
-data.budget=Math.max(30,Math.min(800,Number(data.budget)||180));
+data.budget=Math.max(10,Math.min(800,Number(data.budget)||180));
 if(!/^\d{4}-\d{2}-\d{2}$/.test(data.weekStart)||!Number.isFinite(+parseDate(data.weekStart)))data.weekStart='';
 let weekSnapshot=null, assignReturn='manual';
 let view=data.setup?'home':'intro',flow='intro',step=0,category=0,cardIndex=0,recipeId=null,returnView='plan',assignKey=null;
@@ -157,7 +161,12 @@ if(step===0)html=options('store',STORES);
 if(step===1)html=`<div class="row" style="justify-content:center;margin:25px 0">${button('−','peopleMinus','alt')}<div class="big" style="min-width:75px">${data.people}</div>${button('+','peoplePlus','alt')}</div>`;
 if(step===2)html=chips('days',DAYS);
 if(step===3)html=chips('meals',MEALS);
-if(step===4)html=`<div class="big" id="budgetValue">${money(data.budget)}</div><input aria-label="Wochenbudget" type="range" min="30" max="800" step="10" value="${data.budget}" data-input="budget">`;
+if(step===4){
+const minimum=data.days.length*10;
+html=`<div class="big" id="budgetValue">${money(data.budget)}</div>
+<input aria-label="Wochenbudget" type="range" min="${minimum}" max="800" step="10" value="${data.budget}" data-input="budget">
+<p class="muted">Mindestbudget für ${data.days.length} ${data.days.length===1?'Tag':'Tage'}: ${money(minimum)}.</p>`;
+}
 if(step===5){
 html=options('occasion',OCCASIONS);
 if(data.occasion!=='Kein besonderer Anlass'){
@@ -191,6 +200,7 @@ if(flow==='intro'&&step===4){
 data.setup=true;save();startWeek();return;
 }
 if(flow==='week'&&step===6)return;
+if(flow==='week'&&step===3)data.budget=Math.max(data.days.length*10,Math.round(data.budget/10)*10);
 step++;render();
 }
 function newRecipes(){
@@ -227,7 +237,7 @@ ${progress(category,cats.length)}
 <p class="muted">Wische nach rechts für «Gefällt mir» und nach links für «Nein».</p>
 <p class="muted">Rezept ${cardIndex+1} von ${c.recipes.length}</p>
 <div class="recipe" id="swipeCard">
-<img class="photo" src="${r.img}" alt="${esc(r.name)}" onerror="this.style.display='none'">
+${r.img?`<img class="photo" src="${r.img}" alt="${esc(r.name)}" onerror="this.style.display='none'">`:''}
 <div class="recipebody">
 <div class="badge">${r.min} Minuten · ca. ${money(r.cost)} pro Person</div>
 <h2>${esc(r.name)}</h2>
@@ -262,34 +272,48 @@ view='wizard';step=6;
 }
 render();
 }
+function affordablePlan(){
+const pools=new Map(activeMeals().map(meal=>[
+meal,R.filter(r=>r.meal===meal&&safe(r)).sort((a,b)=>a.cost-b.cost)
+]));
+const entries=slots().map(slot=>({...slot,pool:pools.get(slot.meal)}));
+const missing=activeMeals().filter(meal=>!pools.get(meal).length);
+if(missing.length)return {error:'Keine passenden Rezepte für '+missing.join(', ')+'. Ändere die Mahlzeiten oder deine Rezeptfilter.'};
+let cost=entries.reduce((sum,entry)=>sum+entry.pool[0].cost*data.people,0);
+if(cost>data.budget)return {error:'Mit diesen Einstellungen kostet der günstigste vollständige Plan geschätzt '+money(cost)+'. Erhöhe das Budget oder passe Tage, Personen oder Mahlzeiten an.'};
+const plan={};
+const occurrences={};
+for(const {key,meal,pool} of entries){
+const used=occurrences[meal]||0;
+const fits=r=>cost+(r.cost-pool[0].cost)*data.people<=data.budget;
+const preferred=pool.filter(r=>data.liked.includes(r.id)&&fits(r));
+const choices=preferred.length?preferred:pool.filter(fits);
+const recipe=choices[used%choices.length];
+plan[key]=recipe.id;
+cost+=(recipe.cost-pool[0].cost)*data.people;
+occurrences[meal]=used+1;
+}
+return {plan};
+}
 function arrange(){
+const {error}=affordablePlan();
 return `<div class="card">
 <div class="eyebrow">Letzter Schritt</div>
 <div class="progress"><div style="width:100%"></div></div>
 <h1>Deine Rezepte sind ausgewählt! 🎉</h1>
 <p>Du hast <b>${data.liked.length} Rezepte</b> ausgewählt.</p>
-${data.liked.length===0?'<p class="note">Bitte wähle mindestens ein Rezept.</p>':''}
+${error?`<p class="note">${esc(error)}</p>`:'<p class="muted">Mealio bevorzugt deine Auswahl und ergänzt bei Bedarf günstigere Rezepte innerhalb deines Budgets.</p>'}
 <h2>Wer soll die Gerichte verteilen?</h2>
-<button class="choice" ${data.liked.length?'':'disabled'} data-action="finishAuto"><b>✨ Mealio ordnet automatisch</b><br><small>Die ausgewählten Rezepte werden auf die Wochentage verteilt.</small></button>
-<button class="choice" ${data.liked.length?'':'disabled'} data-action="finishManual"><b>📅 Ich ordne selbst</b><br><small>Du entscheidest, wann du welches Gericht isst.</small></button>
+<button class="choice" ${error?'disabled':''} data-action="finishAuto"><b>✨ Mealio ordnet automatisch</b><br><small>Die ausgewählten Rezepte werden auf die Wochentage verteilt.</small></button>
+<button class="choice" ${error?'disabled':''} data-action="finishManual"><b>📅 Ich ordne selbst</b><br><small>Du entscheidest, wann du welches Gericht isst.</small></button>
 ${button('← Neue Rezepte auswählen','newRecipes','alt full')}
 ${button('Planungseinstellungen ändern','editWeek','ghost full')}
 </div>`;
 }
 function finishPlan(mode){
-if(!data.liked.length){alert('Bitte wähle mindestens ein Rezept.');return;}
-data.plan={};
-if(mode==='auto'){
-const count={};
-slots().forEach(s=>{
-const pool=R.filter(r=>data.liked.includes(r.id)&&r.meal===s.meal);
-if(pool.length){
-const n=count[s.meal]||0;
-data.plan[s.key]=pool[n%pool.length].id;
-count[s.meal]=n+1;
-}
-});
-}
+const result=affordablePlan();
+if(result.error)return;
+data.plan=mode==='auto'?result.plan:{};
 data.weekStart=data.pendingWeek||iso(monday());
 data.lastLiked=[...data.liked];
 data.checks={};
@@ -311,10 +335,16 @@ function assign(){
 if(!assignKey)return `<div class="card">${button('Zurück','go:plan')}</div>`;
 const meal=assignKey.split('|')[1];
 const eligible=R.filter(r=>r.meal===meal&&safe(r));
-const selected=eligible.filter(r=>data.lastLiked.includes(r.id));
-const pool=selected.length?selected:eligible;
+const current=R.find(r=>r.id===data.plan[assignKey]);
+const reserved=slots().filter(s=>s.key!==assignKey&&!data.plan[s.key]).reduce((sum,s)=>{
+const costs=R.filter(r=>r.meal===s.meal&&safe(r)).map(r=>r.cost);
+return sum+Math.min(...costs)*data.people;
+},0);
+const maxCost=data.budget-total()+(current?.cost||0)*data.people-reserved;
+const pool=eligible.filter(r=>r.cost*data.people<=maxCost)
+.sort((a,b)=>Number(data.lastLiked.includes(b.id))-Number(data.lastLiked.includes(a.id))||a.cost-b.cost);
 return `<div class="card"><h1>${esc(assignKey.replace('|',' · '))}</h1>
-${pool.map(r=>`<button class="choice" data-action="choose:${r.id}">${esc(r.name)}<br><small>${r.min} Minuten</small></button>`).join('')||'<p>Für diese Mahlzeit hast du kein Rezept ausgewählt.</p>'}
+${pool.map(r=>`<button class="choice" data-action="choose:${r.id}">${esc(r.name)}<br><small>${r.min} Minuten · ${money(r.cost*data.people)}</small></button>`).join('')||'<p>Für diese Mahlzeit passt kein Rezept ins verbleibende Budget.</p>'}
 ${button('← Zurück','go:'+assignReturn,'alt')}</div>`;
 }
 function showDetails(id,from){
@@ -324,7 +354,7 @@ function details(){
 const r=R.find(x=>x.id===recipeId);
 if(!r)return `<div class="card">${button('Zurück','go:plan')}</div>`;
 return `<div class="recipe">
-<img class="photo" src="${r.img}" alt="${esc(r.name)}">
+${r.img?`<img class="photo" src="${r.img}" alt="${esc(r.name)}">`:''}
 <div class="recipebody">
 <div class="eyebrow">${esc(r.meal)}</div><h1>${esc(r.name)}</h1>
 <p>⏱ ${r.min} Minuten · 👥 ${data.people} Personen</p>
@@ -420,6 +450,7 @@ ${button(has?'Neue Woche starten':'Wochenplan erstellen','startWeek','full')}
 <h3>${money(total())}</h3>
 </div>
 </div>
+${total()>data.budget?`<p class="note">Dieser bestehende Plan überschreitet das Budget um ${money(total()-data.budget)}.</p>${button('Diese Woche neu planen','reviseWeek','alt full')}`:''}
 <p class="muted">Nur Schätzwerte, keine aktuellen Supermarktpreise.</p>
 </div>`;
 }
@@ -445,6 +476,7 @@ return `<div class="card">
 <h3>${money(total())}</h3>
 </div>
 </div>
+${total()>data.budget?`<p class="note">Dieser bestehende Plan überschreitet das Budget um ${money(total()-data.budget)}.</p>${button('Diese Woche neu planen','reviseWeek','alt full')}`:''}
 ${data.occasion!=='Kein besonderer Anlass'?`<p>🎉 ${esc(data.occasion)} · ${esc(data.occasionDay)}</p>`:''}
 </div>
 ${DAYS.filter(d=>data.days.includes(d)).map(day=>`
@@ -454,7 +486,7 @@ ${activeMeals().map(meal=>{
 const key=day+'|'+meal;
 const r=R.find(x=>x.id===data.plan[key]);
 return `<div class="mini">
-${r?`<img src="${r.img}" alt="${esc(r.name)}">`:''}
+${r?.img?`<img src="${r.img}" alt="${esc(r.name)}">`:''}
 <div class="grow">
 <div class="badge">${esc(meal)}</div>
 <b>${r?esc(r.name):'Noch kein Rezept'}</b>
@@ -539,6 +571,11 @@ rate(dx>0);
 function runAction(action){
 if(action==='startIntro')return startIntro();
 if(action==='startWeek')return startWeek();
+if(action==='reviseWeek'){
+startWeek();
+data.pendingWeek=data.weekStart;
+return;
+}
 if(action==='backWizard')return backWizard();
 if(action==='advanceWizard')return advanceWizard();
 if(action==='newRecipes')return newRecipes();
@@ -564,7 +601,10 @@ return go('assign');
 }
 if(action.startsWith('choose:')){
 if(!assignKey)return go('plan');
-data.plan[assignKey]=Number(action.slice(7));
+const recipe=R.find(r=>r.id===Number(action.slice(7))&&safe(r)&&r.meal===assignKey.split('|')[1]);
+const current=R.find(r=>r.id===data.plan[assignKey]);
+if(!recipe||total()+(recipe.cost-(current?.cost||0))*data.people>data.budget)return;
+data.plan[assignKey]=recipe.id;
 save();
 return go(assignReturn);
 }
