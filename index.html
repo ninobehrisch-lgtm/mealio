@@ -1,7 +1,7 @@
 
 <!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#19764c"><title>Mealio – Dein Wochenplan</title><style>
 :root{--green:#19764c;--ink:#193d2a;--bg:#f3f8f4;--muted:#64786a}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}header{position:sticky;top:0;background:#fff;border-bottom:1px solid #e0e9e1;z-index:5;display:flex;align-items:center;justify-content:space-between;padding:12px 18px}.logo{font-size:25px;font-weight:800;color:var(--green)}main{max-width:680px;margin:auto;padding:18px 14px 110px}.card{background:white;border-radius:20px;padding:20px;margin-bottom:14px;box-shadow:0 3px 14px #12341b0a}h1{font-size:26px;margin:9px 0 12px}h2{font-size:21px}h3{font-size:17px}p{line-height:1.5}.muted,small{color:var(--muted)}.eyebrow{color:var(--green);font-size:12px;letter-spacing:1px;font-weight:800;text-transform:uppercase}button{font:inherit;font-weight:700;cursor:pointer;border:0;border-radius:12px;padding:12px 14px;background:var(--green);color:#fff}button:disabled{opacity:.4;cursor:not-allowed}.alt{background:#e7f2e9;color:var(--green)}.ghost{background:transparent;color:var(--green)}.full{width:100%}.row{display:flex;gap:9px;align-items:center}.grow{flex:1;min-width:0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{display:block;width:100%;text-align:left;background:#f8fbf8;color:var(--ink);border:2px solid #e0eae1;margin:9px 0;padding:14px}.choice.active{background:#e7f5eb;border-color:var(--green)}.chip{display:inline-block;background:white;color:var(--ink);border:1px solid #d4e4d7;border-radius:25px;padding:10px 12px;margin:4px;font-weight:500}.chip.active{background:#dff2e4;border-color:var(--green)}input,select{font:inherit;width:100%;padding:12px;border:1px solid #ceded1;border-radius:11px}input[type=range],input[type=checkbox]{accent-color:var(--green)}label.field{display:block;font-weight:700;margin:15px 0 7px}.progress{height:7px;background:#e1ece3;border-radius:20px;overflow:hidden;margin:12px 0}.progress>div{height:100%;background:var(--green)}.photo{width:100%;height:235px;object-fit:cover;background:#e3eee5;display:block}.recipe{border:1px solid #e1eae3;border-radius:17px;overflow:hidden;margin:13px 0}.recipebody{padding:16px}.mini{display:flex;align-items:center;gap:11px;border-bottom:1px solid #edf1ed;padding:12px 0}.mini img{width:76px;height:67px;object-fit:cover;border-radius:10px}.stat{background:#eff7f0;padding:13px;border-radius:13px}.note{background:#fff5dc;border-radius:12px;padding:13px;font-size:13px;line-height:1.5}.nav{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #dce8df;display:flex;padding:8px 5px max(8px,env(safe-area-inset-bottom));z-index:5}.nav button{flex:1;background:transparent;color:#69806e;padding:8px 2px;font-size:12px}.nav button.active{background:#e7f4ea;color:var(--green)}.hidden{display:none!important}.check{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #edf1ed}.check input{width:22px;height:22px;flex:none}.check.done span{text-decoration:line-through;color:#91a295}.big{font-size:36px;font-weight:800;text-align:center}.empty{padding:16px;border:1px dashed #c8d9cb;border-radius:12px}.badge{color:var(--green);font-size:12px;font-weight:800}.error{background:#fff1ed;color:#8b2b1d;padding:18px;border-radius:12px;white-space:pre-wrap}@media print{header,.nav,button{display:none!important}main{padding:0}.card{box-shadow:none;border:1px solid #ddd}}
-</style></head><body><header><div class="logo">🌿 Mealio</div><button class="ghost" id="topSettings" aria-label="Einstellungen">⚙️</button></header><main id="app"><div class="card"><h1>🌿 Willkommen bei Mealio</h1><p>Falls die App hier stehen bleibt, lade die Seite erneut und prüfe, ob JavaScript aktiviert ist.</p></div></main><nav id="nav" class="nav hidden"><button data-nav="home">🏠<br>Start</button><button data-nav="plan">📅<br>Wochenplan</button><button data-nav="shop">🛒<br>Einkauf</button><button data-nav="settings">⚙️<br>Einstellungen</button></nav><script>
+</style></head><body><header><div class="logo">🌿 Mealio</div><button class="ghost" id="topSettings" aria-label="Einstellungen">⚙️</button></header><main id="app"><div class="card"><h1>🌿 Willkommen bei Mealio</h1><p>Mealio wird geladen …</p><noscript>Bitte aktiviere JavaScript, um Mealio zu öffnen.</noscript></div></main><nav id="nav" class="nav hidden"><button data-nav="home">🏠<br>Start</button><button data-nav="plan">📅<br>Wochenplan</button><button data-nav="shop">🛒<br>Einkauf</button><button data-nav="settings">⚙️<br>Einstellungen</button></nav><script>
 'use strict';
 const DAYS=['Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag','Sonntag'];
 const MEALS=['Frühstück','Vorspeise','Mittagessen','Abendessen','Dessert'];
@@ -38,17 +38,37 @@ const raw=[
 ['Linsen-Kartoffel-Eintopf','Abendessen',30,2,'','Vegan','','Rote Linsen:80:g|Kartoffeln:250:g|Karotten:100:g','Kartoffeln und Karotten klein schneiden|Mit den Linsen in Wasser weich köcheln|Abschmecken und heiss servieren']
 ];
 const R=raw.map((a,i)=>({id:i+1,name:a[0],meal:a[1],min:a[2],cost:a[3],img:a[4]?'https://images.unsplash.com/photo-'+a[4]+'?w=800&q=75':'',diet:a[5],allergens:a[6]?a[6].split(','):[],ingredients:a[7].split('|').map(v=>{const p=v.split(':');return {name:p[0],qty:Number(p[1]),unit:p[2]}}),steps:a[8].split('|')}));
-const KEY='mealio-v4';
+const KEY='mealio-profiles-v1';
+const SESSION=KEY+':session';
+function readLocal(key){
+try{return localStorage.getItem(key);}catch{return null;}
+}
+function writeLocal(key,value){
+try{localStorage.setItem(key,value);return true;}catch{return false;}
+}
+let profile=readLocal(SESSION)||'';
+function profileKey(email){return KEY+':profile:'+email;}
+function loadProfile(email){
+try{return JSON.parse(readLocal(profileKey(email))||'null');}catch{return null;}
+}
+let account=profile&&profile!=='guest'?loadProfile(profile):null;
+if(profile!=='guest'&&!account)profile='';
+let formError='';
 const defaults=()=>({setup:false,name:'',diet:'Alles',allergies:[],dislikes:[],cuisines:[],store:'Coop',people:2,days:[...DAYS],meals:['Mittagessen','Abendessen'],budget:180,occasion:'Kein besonderer Anlass',occasionDay:'Samstag',weekStart:'',pendingWeek:'',plan:{},liked:[],lastLiked:[],checks:{}});
-let data=defaults();try{const old=JSON.parse(localStorage.getItem(KEY)||'null');if(old&&typeof old==='object'){data={...data,...old};for(const k of ['allergies','dislikes','cuisines','days','meals','liked','lastLiked'])if(!Array.isArray(data[k]))data[k]=[];for(const k of ['plan','checks'])if(!data[k]||typeof data[k]!=='object')data[k]={};}}catch(e){}
+let data=defaults();try{const old=JSON.parse((profile==='guest'?readLocal(KEY+':guest')??readLocal('mealio-v4'):readLocal(profileKey(profile)+':plan'))||'null');if(old&&typeof old==='object'){data={...data,...old};for(const k of ['allergies','dislikes','cuisines','days','meals','liked','lastLiked'])if(!Array.isArray(data[k]))data[k]=[];for(const k of ['plan','checks'])if(!data[k]||typeof data[k]!=='object')data[k]={};}}catch(e){}
 data.name=typeof data.name==='string'?data.name:'';
 data.people=Math.max(1,Math.min(20,Math.trunc(Number(data.people))||2));
 data.budget=Math.max(10,Math.min(800,Number(data.budget)||180));
 if(!/^\d{4}-\d{2}-\d{2}$/.test(data.weekStart)||!Number.isFinite(+parseDate(data.weekStart)))data.weekStart='';
 let weekSnapshot=null, assignReturn='manual';
-let view=data.setup?'home':'intro',flow='intro',step=0,category=0,cardIndex=0,recipeId=null,returnView='plan',assignKey=null;
+if(account){data.name=data.name||account.name;if(!data.setup)data.people=Math.min(20,1+account.children);}
+let view=profile&&data.setup?'home':profile?'wizard':'intro',flow='intro',step=account?1:0,category=0,cardIndex=0,recipeId=null,returnView='plan',assignKey=null;
 const $=id=>document.getElementById(id);const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=n=>'CHF '+Number(n).toFixed(2);const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(weekSnapshot ? {...data,...weekSnapshot} : data))}catch(e){}};
+const money=n=>'CHF '+Number(n).toFixed(2);const save=()=>{
+if(!profile)return;
+const key=profile==='guest'?KEY+':guest':profileKey(profile)+':plan';
+writeLocal(key,JSON.stringify(weekSnapshot ? {...data,...weekSnapshot} : data));
+};
 const button=(label,action,cls='')=>`<button class="${cls}" data-action="${esc(action)}">${label}</button>`;
 
 function monday(d=new Date()){
@@ -109,7 +129,15 @@ Object.assign(data,weekSnapshot);
 weekSnapshot=null;
 }
 function startIntro(){
-flow='intro';step=0;view='wizard';render();
+flow='intro';step=account?1:0;view='wizard';render();
+}
+function openProfile(email){
+if(!writeLocal(SESSION,email)){
+formError='Der Browser kann keine lokalen Profile speichern. Öffne die Datei in einem Browser mit aktiviertem Webspeicher.';
+render();
+return;
+}
+location.reload();
 }
 function startWeek(){
 leaveWeek();
@@ -180,10 +208,10 @@ if(step===6)html=`
 const bottom=step===6&&!first
 ?button('← Zurück','backWizard','alt')
 :`<div class="row" style="margin-top:22px">${button('← Zurück','backWizard','alt')}${button(step===steps.length-1?'Fertig ✓':'Weiter →','advanceWizard','grow')}</div>`;
-return `<div class="card">${progress(step,steps.length)}<h1>${steps[step][0]}</h1><p class="muted">${steps[step][1]}</p>${html}${bottom}${first&&step===2?'<p class="note">Die Allergieprüfung ist eine unvollständige Demo. Bitte Zutaten und Verpackungen immer selbst kontrollieren.</p>':''}</div>`;
+return `<div class="card">${progress(first&&account?step-1:step,first&&account?steps.length-1:steps.length)}<h1>${steps[step][0]}</h1><p class="muted">${steps[step][1]}</p>${html}${bottom}${first&&step===2?'<p class="note">Die Allergieprüfung ist eine unvollständige Demo. Bitte Zutaten und Verpackungen immer selbst kontrollieren.</p>':''}</div>`;
 }
 function backWizard(){
-if(step>0){step--;render();return;}
+if(step>(flow==='intro'&&account?1:0)){step--;render();return;}
 leaveWeek();view=flow==='intro'?'intro':'home';render();
 }
 function advanceWizard(){
@@ -406,8 +434,82 @@ return `<div class="card" style="text-align:center;padding:35px 20px">
 <h1>Willkommen bei Mealio!</h1>
 <p>Dein persönlicher Essensplan mit Rezeptbildern, Wochenplanung und Einkaufsliste.</p>
 <p class="muted">Einmal deine Vorlieben einstellen. Jede Woche neue Rezepte entdecken.</p>
-${button('Jetzt starten','startIntro','full')}
+${account
+?button('Einrichtung fortsetzen','startIntro','full')
+:`<div class="row">${button('Anmelden','go:login','grow')}${button('Registrieren','go:register','alt grow')}</div>
+<p>${button('Als Gast fortfahren','guest','ghost full')}</p>`}
+<p class="note">Deine Profile, Wochenpläne und Einkaufslisten werden in diesem Browser gespeichert.</p>
 </div>`;
+}
+function profileForm(){
+const register=view==='register';
+return `<div class="card">
+<h1>${register?'Registrieren':'Anmelden'}</h1>
+<p class="muted">${register?'Erstelle dein Profil.':'Öffne dein gespeichertes Profil.'} Dein Profil ist in diesem Browser verfügbar.</p>
+<form id="profileForm">
+${register?`<label class="field" for="profileName">Vorname</label>
+<input id="profileName" name="name" type="text" maxlength="80" required>`:''}
+<label class="field" for="profileEmail">E-Mail-Adresse</label>
+<input id="profileEmail" name="email" type="email" maxlength="254" required>
+${register?`<label class="field" for="profileBirthday">Geburtsdatum</label>
+<input id="profileBirthday" name="birthday" type="date" min="1900-01-01" max="${iso(new Date())}" required>
+<label class="field" for="profileChildren">Anzahl Kinder</label>
+<input id="profileChildren" name="children" type="number" min="0" max="19" step="1" value="0" required>`:''}
+<label class="field" for="profilePassword">Passwort</label>
+<input id="profilePassword" name="password" type="password" autocomplete="${register?'new-password':'current-password'}" minlength="8" maxlength="128" required>
+<p id="profileError" role="alert">${esc(formError)}</p>
+<button class="full" type="submit">${register?'Profil erstellen':'Profil öffnen'}</button>
+</form>
+<p>${button(register?'Bereits registriert? Anmelden':'Neu bei Mealio? Registrieren',register?'go:login':'go:register','ghost full')}</p>
+${button('← Zurück','go:intro','alt full')}
+</div>`;
+}
+async function passwordVerifier(password,salt){
+const encoder=new TextEncoder();
+const key=await crypto.subtle.importKey('raw',encoder.encode(password),'PBKDF2',false,['deriveBits']);
+const bytes=await crypto.subtle.deriveBits({
+name:'PBKDF2',salt:new Uint8Array(salt),iterations:600000,hash:'SHA-256'
+},key,256);
+return Array.from(new Uint8Array(bytes)).join('.');
+}
+async function submitProfile(form){
+const register=view==='register';
+const fields=new FormData(form);
+const email=String(fields.get('email')).trim().toLowerCase();
+const password=String(fields.get('password'));
+const existing=loadProfile(email);
+const error=form.querySelector('[role="alert"]');
+const submit=form.querySelector('[type="submit"]');
+error.textContent='';
+submit.disabled=true;
+try{
+if(!register){
+if(!existing||await passwordVerifier(password,existing.salt)!==existing.verifier){
+error.textContent='E-Mail-Adresse oder Passwort stimmt nicht.';
+return;
+}
+if(form.isConnected)openProfile(email);
+return;
+}
+const name=String(fields.get('name')).trim();
+if(!name){error.textContent='Bitte gib einen Vornamen ein.';return;}
+if(existing){error.textContent='Für diese E-Mail gibt es bereits ein Profil. Wähle «Anmelden».';return;}
+const birthday=String(fields.get('birthday'));
+const children=Number(fields.get('children'));
+const salt=Array.from(crypto.getRandomValues(new Uint8Array(16)));
+const verifier=await passwordVerifier(password,salt);
+if(!form.isConnected)return;
+if(loadProfile(email)){error.textContent='Für diese E-Mail gibt es bereits ein Profil.';return;}
+if(!writeLocal(profileKey(email),JSON.stringify({name,birthday,children,salt,verifier}))){
+error.textContent='Der Browser konnte das Profil nicht speichern.';
+return;
+}
+openProfile(email);
+}catch{
+error.textContent='Das Profil konnte nicht geöffnet oder gespeichert werden. Prüfe, ob du Mealio über HTTPS mit aktiviertem Webspeicher geöffnet hast.';
+}finally{
+submit.disabled=false;
+}
 }
 function home(){
 const has=!!data.weekStart;
@@ -537,6 +639,7 @@ function settings(){
 return `<div class="card">
 <div class="eyebrow">Persönliche Einstellungen</div>
 <h1>⚙️ Einstellungen</h1>
+${account?`<p class="muted">Profil · ${esc(profile)} · Kinder: ${account.children}</p>`:''}
 <p class="muted">Deine Angaben bleiben für die nächsten Wochen gespeichert.</p>
 <label class="field">Vorname</label>
 <input data-input="name" value="${esc(data.name)}">
@@ -550,6 +653,7 @@ ${chips('dislikes',DISLIKES)}
 ${chips('cuisines',CUISINES)}
 <p class="note">Die Allergiefilter sind nicht vollständig. Kontrolliere Lebensmittel immer selbst.</p>
 ${button('✓ Speichern',data.setup?'go:home':'go:intro','full')}
+<p>${button(account?'Abmelden':'Zum Profilmenü','signOut','ghost full')}</p>
 </div>`;
 }
 function enableSwipe(){
@@ -569,6 +673,19 @@ rate(dx>0);
 },{passive:true});
 }
 function runAction(action){
+if(action==='guest'){
+profile='guest';
+account=null;
+const previousGuest=readLocal(KEY+':guest');
+if(previousGuest||readLocal('mealio-v4')){openProfile('guest');return;}
+writeLocal(SESSION,'guest');
+return startIntro();
+}
+if(action==='signOut'){
+leaveWeek();
+if(writeLocal(SESSION,''))location.reload();
+return;
+}
 if(action==='startIntro')return startIntro();
 if(action==='startWeek')return startWeek();
 if(action==='reviseWeek'){
@@ -613,12 +730,13 @@ return showDetails(Number(action.slice(8)),view);
 }
 }
 function render(){
-const pages={intro,wizard,swipe,arrange,manual,assign,details,home,plan,shop,settings};
+const pages={intro,login:profileForm,register:profileForm,wizard,swipe,arrange,manual,assign,details,home,plan,shop,settings};
 const app=$('app');
+$('topSettings').hidden=!profile||!data.setup;
 try{
 app.innerHTML=(pages[view]||intro)();
 $('nav').classList.toggle('hidden',
-!data.setup||['wizard','swipe','arrange','manual','assign','details'].includes(view));
+!data.setup||['intro','login','register','wizard','swipe','arrange','manual','assign','details'].includes(view));
 document.querySelectorAll('[data-nav]').forEach(b=>{
 b.classList.toggle('active',b.dataset.nav===view);
 });
@@ -630,6 +748,11 @@ esc(error.message)+'</p></div>';
 console.error(error);
 }
 }
+document.addEventListener('submit',event=>{
+if(event.target.id!=='profileForm')return;
+event.preventDefault();
+submitProfile(event.target);
+});
 document.addEventListener('click',event=>{
 const nav=event.target.closest('[data-nav]');
 if(nav){leaveWeek();go(nav.dataset.nav);return;}
